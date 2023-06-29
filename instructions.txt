@@ -1,7 +1,15 @@
-How to use a git repository 
+How to use a git repository:
 Make a clone of repository by entering "git clone git@github.com:sumbarger/GMC_code.git ~"location
 The location is where you want the repository
+
+Before you start typing, you need to enter "git pull origin main"
+This will pull the file from the remote repository
+Then you enter your message
 After adding message, type "git add" and then "git commit"
+Then you will need to send it back to the remote repository
+To do this you enter "git push origin main"
+
+Some helpful commands:
 "git diff" shows the difference between previous commited and version just made
 "git diff --staged" shows the difference after "git add" was completed
 "git log" shows when each version was commited along with the commit ID
