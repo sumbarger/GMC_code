@@ -4,3 +4,4 @@ After adding message, type "git add" and then "git commit"
 "git diff --staged" shows the difference after "git add" was completed
 "git log" shows when each version was commited along with the commit ID
 This also includes the message typed with "git commit"
+"git diff HEAD" shows you previous commits
