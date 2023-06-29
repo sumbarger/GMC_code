@@ -3,10 +3,11 @@ Make a clone of repository by entering "git clone git@github.com:sumbarger/GMC_c
 The location is where you want the repository
 
 Before you start typing, you need to enter "git pull origin main"
+This is important to do otherwise it could lead to conflicts
 This will pull the file from the remote repository
 Then you enter your message
 After adding message, type "git add" and then "git commit"
-Then you will need to send it back to the remote repository
+Then you will need to send it back and save changes to the remote repository
 To do this you enter "git push origin main"
 
 Some helpful commands:
