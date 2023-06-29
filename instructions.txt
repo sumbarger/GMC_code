@@ -1,1 +1,2 @@
 test one
+After adding message, type "git add" and then "git commit"
