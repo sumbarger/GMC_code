@@ -1,4 +1,6 @@
 How to use a git repository 
+Make a clone of repository by entering "git clone git@github.com:sumbarger/GMC_code.git ~"location
+The location is where you want the repository
 After adding message, type "git add" and then "git commit"
 "git diff" shows the difference between previous commited and version just made
 "git diff --staged" shows the difference after "git add" was completed
