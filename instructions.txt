@@ -1,7 +1,9 @@
-test one
+How to use a git repository 
 After adding message, type "git add" and then "git commit"
 "git diff" shows the difference between previous commited and version just made
 "git diff --staged" shows the difference after "git add" was completed
 "git log" shows when each version was commited along with the commit ID
 This also includes the message typed with "git commit"
 "git diff HEAD" shows you previous commits
+"git checkout" restores previous verisons 
+To do this you need the commit ID
