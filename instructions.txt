@@ -1,14 +1,21 @@
-How to use a git repository:
-Make a clone of repository by entering "git clone git@github.com:sumbarger/GMC_code.git ~"location
-The location is where you want the repository
+HOW TO CLONE A GITHUB REPOSITORY:
+First create an empty folder in the desired location of your computer (this is step is optional as you can just let git clone the repository in your User and then manually move it around) 
+Make a clone of repository by entering "git clone git@github.com:sumbarger/GMC_code.git *location*"
+Replace *location* with the name of the created folder or leave it out if you don't have one 
 
-Before you start typing, you need to enter "git pull origin main"
+MAKING EDITS:
+Before you start making edits, you should always navagate to the repository folder via the terminal and enter "git pull origin main" 
+This is to ensure that your version of the repository is up to date
 This is important to do otherwise it could lead to conflicts
 This will pull the file from the remote repository
-Then you enter your message
-After adding message, type "git add" and then "git commit"
+Once you have made edits to a file, navigate to its location via terminal and type "git add *file name here*"
+this will add edits to a queue on github which can be commited by the repository owner
+you can commit the changes yourself by typing: git commit *file name here -m"Put your message here" 
+your message should include a brief description of the changes you have made to the edited file(s)
 Then you will need to send it back and save changes to the remote repository
 To do this you enter "git push origin main"
+
+Note- It would be a good idea to memorize the pattern of editing a repository: pull, add, commit, push
 
 Some helpful commands:
 "git diff" shows the difference between previous commited and version just made
