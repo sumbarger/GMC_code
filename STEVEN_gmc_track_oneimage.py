@@ -601,14 +601,16 @@ ax1.get_yaxis().set_visible(False)
 ax2.get_xaxis().set_visible(False)
 ax2.get_yaxis().set_visible(False)
 
-#c
+#assigning colors and labels
 norm1 = matplotlib.colors.LogNorm(vmin=1,vmax=1000)
 cb = matplotlib.colorbar.ColorbarBase(axcb,norm=norm1)
 cb.set_label('$\Sigma$ (M$_{\odot}$/pc$^2$)')
 
+#creating labels
 ax0.set_title(r'$t_0$')
 ax1.set_title(r'$t_1$')
 ax2.set_title(r'$t_2$')
 
+#saving plot
 plt.savefig('andrew_gmc_cluster.pdf',bbox_inches='tight') 
 plt.close(fig)
