@@ -15,7 +15,7 @@ from astropy.table import Table
 
 MsunToGm = 1.99e33 #conversion from mass of sun to the mass times the constant G
 KpcToCm = 3.086e21 #conversion from kiloparsecs to centimeters
-mp = 1.67e-24 #???
+mp = 1.67e-24 #mass of a proton in mega grams
 #bin_edge = 10.
 bin_edge = 20. #the bin edge value
 ##gas properties to carry around
@@ -64,7 +64,7 @@ sycm = np.zeros(shape=(len(snaps),len(cl_id))) #star y position in cm
 szcm = np.zeros(shape=(len(snaps),len(cl_id))) #star z position in cm
 ap_num = np.zeros(shape=(len(snaps),len(cl_id))) #???
 
-r_ap = 0.05 #???
+r_ap = 0.05 #radius of ap
 
 point_gas = [] #gas point
 
@@ -108,7 +108,7 @@ for i in range(len(snaps)): #if i is in the range of the length of snaps
     mg.append(part['gas']['mass'][ig])
     #add the mass of ig to the mass values of the gas
     rhog.append(part['gas'].prop('number.density')[ig])
-    #add the density of ig to the density values of the gas
+    #add the number density of ig to the density values of the gas
     tg.append(part['gas']['temperature'][ig])
     #add the temperature of ig to the temperature values of the gas
     idg.append(part['gas']['id'][ig])
@@ -155,8 +155,8 @@ for i in range(len(snaps)): #if i is in the range of the length of snaps
     for j in range(len(cl_id)):
         #when it is in the range of the length of the pickle file we opened
         cl = cl_id[j] #assign variable cl to be the points in the range of the pickle file m12m
-        ind = [] #???
-        check = [] #???
+        ind = [] #creating a list
+        check = [] #creating a list
         print(j, ind, check) #print the j, ind, and check
         for k in range(len(cl)):
             #when it is in the range of the length of cl
@@ -184,9 +184,9 @@ for i in range(len(snaps)): #if i is in the range of the length of snaps
         #add the ind2 of the zsh to the star z position
 
         rh = np.sqrt((xgh-sxcm[i,j])**2 + (ygh-sycm[i,j])**2 + (zgh-szcm[i,j])**2)
-        #calculate the density of the gas using the x, y, and z of the gas
+        #calculate the radius/distance between gas and a star
         rsh = np.sqrt((xsh-sxcm[i,j])**2 + (ysh-sycm[i,j])**2 + (zsh-szcm[i,j])**2)
-        #calculate the density of the gas using the x, y, and z of the stars
+        #calculate the radius/distance of the stars
         ind = np.where(rh <= r_ap)
         #assigns variable ind to be the values where the density is less than r_ap
         n = np.float(len(ind[0]))
@@ -201,6 +201,8 @@ for i in range(len(snaps)): #if i is in the range of the length of snaps
         #add the indst of the xsh to sxp_new
         syp_new.append(ysh[indst])
         #add the indst of the ysh to syp_new
+        
+        #appears to be a filter for "ind"
         if (len(ind[0]) > 0): #if statement if it is greater than 0
             vmean = np.average(vxgh[ind],weights=mgh[ind])
             #calculate the average and the weights
@@ -279,10 +281,12 @@ for focus in focus_list:
     backward = [] #use tracking
     for i in range(len(cluster_gas)):
         if (len(np.where(idata0['id'] == cluster_gas[i])[0]) == 2):
-            #if it is equal to the cluster gas id number
-            dists = np.sqrt((idata0['x'][np.where(idata0['id'] == cluster_gas[i])[0]]-xh)**2 + (idata0['y'][np.where(idata0['id'] == cluster_gas[i])[0]]-yh)**2 + (idata0['z'][np.where(idata0['id'] == cluster_gas[i])[0]]-zh)**2) #calculate the distance
-            #print(idata0['id'][np.where(idata0['id'] == cluster_gas[i])[0][np.where(dists == np.min(dists))]])
-            #print the id of the clouds
+            #look at the number of items in the first row of cloud_props_m12m_590.txt and if it is row 2...
+            dists = np.sqrt((idata0['x'][np.where(idata0['id'] == cluster_gas[i])[0]]-xh)**2 + (idata0['y'][np.where(idata0['id'] == cluster_gas[i])[0]]-yh)**2 + (idata0['z'][np.where(idata0['id'] == cluster_gas[i])[0]]-zh)**2) 
+            #create an array that finds the changes between two snapshots
+            
+            ##print(idata0['id'][np.where(idata0['id'] == cluster_gas[i])[0][np.where(dists == np.min(dists))]])
+            #the id of the clouds
             backward.append(idata0['cloud number'][np.where(idata0['id'] == cluster_gas[i])[0][np.where(dists == np.min(dists))]])
             #add the cloud number to backward tracking
             #print(idata0['x'][np.where(idata0['id'] == cluster_gas[i])[0][np.where(dists == np.min(dists))]])
@@ -308,29 +312,50 @@ for focus in focus_list:
     for i in range(len(cluster_gas)):
         #i in the range of the length of the cluster_gas
         if (len(np.where(idata2['id'] == cluster_gas[i])[0]) == 1):
-            #if the length of of the id is equal to the cluster_gas
+            #look at the number of items in the first row of cloud_indices_m12m_592.txt and if it is row 1...
+            
             evolve.append(idata2['cloud number'][np.where(idata2['id'] == cluster_gas[i])[0]])
+            #add to the first column of "evolve" everything under the 'cloud number' column
             evolve_mass.append(np.float(idata2['mass'][np.where(idata2['id'] == cluster_gas[i])[0]]))
-        if (len(np.where(idata2['id'] == cluster_gas[i])[0]) == 2):
+            #add to the first column of "evolve_mass" floating point values of everything under the column 'mass'
+            
+        if (len(np.where(idata2['id'] == cluster_gas[i])[0]) == 2):  
+            #look at the number of items in the second row of cloud_indices_m12m_592.txt and if it is row 2...
             dists = np.sqrt((idata2['x'][np.where(idata2['id'] == cluster_gas[i])[0]]-xh)**2 + (idata2['y'][np.where(idata2['id'] == cluster_gas[i])[0]]-yh)**2 + (idata2['z'][np.where(idata2['id'] == cluster_gas[i])[0]]-zh)**2)
+            #create an array that finds the changes between two snapshots 
+            
             evolve.append(idata2['cloud number'][np.where(idata2['id'] == cluster_gas[i])[0][np.where(dists == np.min(dists))]])
+            #add to the first column of "evolve" everything under the minimum distances in 'cloud number' column
             evolve_mass.append(np.float(idata2['mass'][np.where(idata2['id'] == cluster_gas[i])[0][np.where(dists == np.min(dists))]]))
+            #add to the first column of "evolve_mass" everything under the minimum distances in 'cloud number' column
 
     #look at the whole cloud
         
     evolve = np.array(evolve)
+    #turn evolve into an array
     evolve_mass = np.array(evolve_mass)
+    #turn evolve_mass into an array
     unq = np.unique(evolve)
+    #remove any duplicate values in 'evolve'
     unq_mass = np.zeros(len(unq))
+    #make an array of zeros with dimension # of items in unq
     for i in range(len(unq)):
+        #for every value in the range len(unq)
         k = np.where(evolve == unq[i])[0]
+        #make array k where the first column contains all the the unique values of evolve
         unq_mass[i] = np.sum(evolve_mass[k])
+        #set unqmass[i] to the added up values of all the items in evolve_mass
 
     if (len(unq_mass) > 0):
+        #if the number of items in 'unq_mass' is less than 0...
         match = np.where(unq_mass == np.max(unq_mass))
+        #give the condition "match" when the unique mass equal to the max mass
         evolve_cl = unq[match]
+        #remove all the duplicate values from 'match' and put the unique values into evolve_cm
         evolve_cl_m = unq_mass[match][0]
+        #set evolve_cl_m to the first element that is in the array of the unq_mass[match]
         evolve_cl_mtot = data2['mass'][np.where(data2['cloud number'] == evolve_cl)]
+        #look into the 'mass' column of cloud_props_m12m_592.txt where the 'cloud number' match the evolve_cm numbers, tldr: look for all the matching cloud numbers
         ratio = evolve_cl_m/focus_cl_m
     else:
         ratio = 0.
@@ -349,29 +374,37 @@ for focus in focus_list:
     xcm_track[0,focus] = data0['xcm'][np.where(data0['cloud number'] == original_cl)]
     ycm_track[0,focus] = data0['ycm'][np.where(data0['cloud number'] == original_cl)]
     zcm_track[0,focus] = data0['zcm'][np.where(data0['cloud number'] == original_cl)]
-
+#the above code seems to be a series of checks for values within different rows in the data files and then assinging the true/false values to items in the listed arrays.
         
     if ((ratio < 0.5) | (evolve_cl_m/evolve_cl_mtot < 0.5)):
+        #if the ratio is less than .5 or the ratio between evolve_cl_m and evolve_cl_mtot is less than .5...
         print(focus,evolve_cl,np.float(ratio),"DEAD",np.float(evolve_cl_m/evolve_cl_mtot))
+        #print all these variables
         alpha_track[2,focus] = 0.
         vdisp_track[2,focus] = 0.
         mass_track[2,focus] = 0.
+        #set the second item under 'focus' to zero for all the arrays
         xcm_track[2,focus] = sxcm[2,focus]
         ycm_track[2,focus] = sycm[2,focus]
         zcm_track[2,focus] = szcm[2,focus]
+        #set the second item under 'focus' to the second item under focus in the sxcm, sycm, and szcm arrays
     elif ((ratio >= 0.5) & (evolve_cl_m/evolve_cl_mtot >= 0.5)):
         print(focus, evolve_cl,np.float(ratio),'ALIVE')
+        #print stuff
         mass_track[2,focus] = data2['mass'][np.where(data2['cloud number'] == evolve_cl)]
+        #check if cloud number is evolve_cl then set mass_track[2,focus] to the true/false
         alpha_track[2,focus] = data2['alpha_vir'][np.where(data2['cloud number'] == evolve_cl)]
         #alpha_s_track[2,focus] = data2['alpha_vir_s'][np.where(data2['cloud number'] == evolve_cl)]
         vdisp_track[2,focus] = np.sqrt(data2['vdisp_x'][np.where(data2['cloud number'] == evolve_cl)]**2 + data2['vdisp_y'][np.where(data2['cloud number'] == evolve_cl)]**2 + data2['vdisp_z'][np.where(data2['cloud number'] == evolve_cl)]**2)/np.sqrt(3.)
+        #calculate total velocity and then assign it to the positon in the array
         xcm_track[2,focus] = data2['xcm'][np.where(data2['cloud number'] == evolve_cl)]
         ycm_track[2,focus] = data2['ycm'][np.where(data2['cloud number'] == evolve_cl)]
         zcm_track[2,focus] = data2['zcm'][np.where(data2['cloud number'] == evolve_cl)]
+        #more assigning true/false check to items in an array
 
-print(sxcm[:,38])
-print(sycm[:,38])
-print(szcm[:,38])
+print(sxcm[:,38]) #print
+print(sycm[:,38]) #print
+print(szcm[:,38]) #print
 ################################################################################
 # try to make some nicer images
 ################################################################################
@@ -393,48 +426,50 @@ w2d_kernel = []
 nkernel = 200
 w2d_table = np.zeros(nkernel+3)
 
-vel_array0 = np.zeros(shape=(2,stepn, stepn))
-vel_array1 = np.zeros(shape=(2,stepn, stepn))
-vel_array2 = np.zeros(shape=(2,stepn, stepn))
+vel_array0 = np.zeros(shape=(2,stepn, stepn)) #make empty arrays
+vel_array1 = np.zeros(shape=(2,stepn, stepn)) #make empty arrays
+vel_array2 = np.zeros(shape=(2,stepn, stepn)) #make empty arrays
 
 #read the kernel file
 kernelfile = 'kernel2d'
-temp = open(kernelfile,'r').read().split('\n')
+temp = open(kernelfile,'r').read().split('\n') #open kernel file and read
 
-for i in range(len(temp)-1):
-    if (i%2 == 0):
+for i in range(len(temp)-1): #in the range of temperature minus one
+    if (i%2 == 0): #if i/2 is zero
         w2d_kernel.append(np.float(temp[i]))
+        #add the temperature of i to the 'w2d_kernel'
 
-w2d_kernel.append(0.)
-w2d_kernel = np.array(w2d_kernel)
+w2d_kernel.append(0.) #add a zero floating point to 'w2d_kernel'
+w2d_kernel = np.array(w2d_kernel) #make an array
 
-stepnh= (stepn-1)/2
-res= sizebox/stepn
-print('stepnh = ', stepnh)
-print('res = ', res)
+stepnh= (stepn-1)/2 #value
+res= sizebox/stepn #resolution
+print('stepnh = ', stepnh) #print
+print('res = ', res) #print
 
 #focus = 38
 focus = 1
 
-for t in range(len(snaps)):
-    w2darray = np.zeros(shape=(stepn, stepn))
-    vel_array = np.zeros(shape=(stepn, stepn))
-    xcen = xcm_track[t,focus]
-    ycen = ycm_track[t,focus]
-    zcen = zcm_track[t,focus]
+for t in range(len(snaps)): #look at the snapshot
+    w2darray = np.zeros(shape=(stepn, stepn)) #make an empty array with dimensions of stepn by stepn
+    vel_array = np.zeros(shape=(stepn, stepn)) #make an empty array with dimensions of stepn by stepn
+    xcen = xcm_track[t,focus] #set variable x center to the x position of the track with snapshot and focus
+    ycen = ycm_track[t,focus] #set variable y center to the y position of the track with snapshot and focus
+    zcen = zcm_track[t,focus] #set variable z center to the z position of the track with snapshot and focus
     
     #read in sim snap
     part = gizmo.io.Read.read_snapshots('all', 'snapshot_index', snaps[t],'/home/smbeninc/scr/m12m/m12m_res7100/',assign_host_principal_axes=True)
     #part = gizmo.io.Read.read_snapshots('all', 'snapshot_index', snaps[t],assign_host_principal_axes=True)
     
     ig = np.where((part['gas'].prop('host.distance.principal.cartesian')[:,0] <= (xcen + bin_edge)) & (part['gas'].prop('host.distance.principal.cartesian')[:,0] > (xcen - bin_edge)) &  (part['gas'].prop('host.distance.principal.cartesian')[:,1] > (ycen - bin_edge)) & (part['gas'].prop('host.distance.principal.cartesian')[:,1] <= (ycen + bin_edge)) & (np.fabs(part['gas'].prop('host.distance.principal.cartesian')[:,2]) <= 1.5))
-    ngas = len(ig[0])
+    #take cartesian coordinate of gas distance difference and creating bounds
+    ngas = len(ig[0]) #setting variable to the length of ig
     
-    xg = part['gas'].prop('host.distance.principal.cartesian')[ig[0],0]
-    yg = part['gas'].prop('host.distance.principal.cartesian')[ig[0],1]
-    zg = part['gas'].prop('host.distance.principal.cartesian')[ig[0],2]
-    mg = part['gas']['mass'][ig]
-    hg = part['gas']['smooth.length'][ig]
+    xg = part['gas'].prop('host.distance.principal.cartesian')[ig[0],0] #x cartesian coordinate of gas
+    yg = part['gas'].prop('host.distance.principal.cartesian')[ig[0],1] #y cartesian coordinate of gas
+    zg = part['gas'].prop('host.distance.principal.cartesian')[ig[0],2] #z cartesian coordinate of gas
+    mg = part['gas']['mass'][ig] #mass of the gas
+    hg = part['gas']['smooth.length'][ig] #assigning smooth lengh values of gas to hg
     
     #set the kernel weights, make sure to normalize properly
     for i in range(ngas):
@@ -443,7 +478,8 @@ for t in range(len(snaps)):
         
     ##big loop
     for i in range(ngas):
-        xi = (xg[i]-xcen)/res+stepnh
+        #tells computer where to position data where it is visible
+        xi = (xg[i]-xcen)/res+stepnh 
         yi = (yg[i]-ycen)/res+stepnh
         hi = 2*hg[i]/res
         
@@ -467,16 +503,16 @@ for t in range(len(snaps)):
             iymax=stepn-1
         if (iymax < 0):
             iymax=0
-            
+        #some imagining conditions    
         if (i%1000 == 0):
-            print("Doing particle: ",i,ngas)
+            print("Doing particle: ",i,ngas) #print
             
         count = count + 1
         w2d_sum = 0.
         d2max = 4.*hg[i]*hg[i]
         kernfrac = nkernel*.5/hg[i]
         loop = np.arange(ixmin,ixmax+1,1)
-        for ii in range(len(loop)):
+        for ii in range(len(loop)): #more organizing values to variables
             r0xx = (ii - stepnh)*res + xcen
             for jj in range(len(loop)):
                 r0yy = (jj-stepnh)*res + ycen
@@ -513,17 +549,19 @@ for t in range(len(snaps)):
    
         
 
-fig = plt.figure(figsize=(8,2.5))
+fig = plt.figure(figsize=(8,2.5)) #sets up figure
 
-gs0 = gridspec.GridSpec(1, 4, width_ratios=[1,1,1,0.1])
+gs0 = gridspec.GridSpec(1, 4, width_ratios=[1,1,1,0.1]) #sets up grid
 #gs00 = gridspec.GridSpecFromSubplotSpec(1, 3, subplot_spec=gs0[0],wspace=0.05)
 #gs01 = gridspec.GridSpecFromSubplotSpec(1, 3, subplot_spec=gs0[1],wspace=0.05)
 
+#sets up plots
 ax0 = plt.subplot(gs0[0])
 ax1 = plt.subplot(gs0[1])
 ax2 = plt.subplot(gs0[2])
 axcb = plt.subplot(gs0[3])
 
+#displays plots
 ax0.imshow(vel_array0[0,:,:]/((res*1000.)**2), interpolation='gaussian',norm=colors.LogNorm(),vmin=1,vmax=1000,extent=(xcm_track[0,1]-0.5,xcm_track[0,1]+0.5,ycm_track[0,1]-0.5,ycm_track[0,1]+0.5))
 ax1.imshow(vel_array1[0,:,:]/((res*1000.)**2), interpolation='gaussian',norm=colors.LogNorm(),vmin=1,vmax=1000,extent=(xcm_track[1,1]-0.5,xcm_track[1,1]+0.5,ycm_track[1,1]-0.5,ycm_track[1,1]+0.5))
 ax2.imshow(vel_array2[0,:,:]/((res*1000.)**2), interpolation='gaussian',norm=colors.LogNorm(),vmin=1,vmax=1000,extent=(xcm_track[2,1]-0.5,xcm_track[2,1]+0.5,ycm_track[2,1]-0.5,ycm_track[2,1]+0.5))
@@ -544,7 +582,7 @@ ax2.scatter(sxp[73+2*len(cl_id)], syp[73+2*len(cl_id)], s=8,marker='*', edgecolo
 
 
 
-
+#more plotting
 #ax11.scatter(sxcm[1,1],sycm[1,1],marker='o',s=80,edgecolors='k',facecolors='none',linewidth=0.75)
 #ax11.scatter(sxcm[1,37],sycm[1,37],marker='o',s=80,edgecolors='k',facecolors='none',linewidth=0.75)
 #ax11.scatter(sxcm[1,54],sycm[1,54],marker='o',s=80,edgecolors='k',facecolors='none',linewidth=0.75)
@@ -555,6 +593,7 @@ ax2.scatter(sxp[73+2*len(cl_id)], syp[73+2*len(cl_id)], s=8,marker='*', edgecolo
 #ax12.scatter(sxcm[2,54],sycm[2,54],marker='o',s=80,edgecolors='k',facecolors='none',linewidth=0.75)
 #ax12.scatter(sxcm[2,73],sycm[2,73],marker='o',s=80,edgecolors='k',facecolors='none',linewidth=0.75)
 
+#removing visibility
 ax0.get_xaxis().set_visible(False)
 ax0.get_yaxis().set_visible(False)
 ax1.get_xaxis().set_visible(False)
@@ -562,6 +601,7 @@ ax1.get_yaxis().set_visible(False)
 ax2.get_xaxis().set_visible(False)
 ax2.get_yaxis().set_visible(False)
 
+#c
 norm1 = matplotlib.colors.LogNorm(vmin=1,vmax=1000)
 cb = matplotlib.colorbar.ColorbarBase(axcb,norm=norm1)
 cb.set_label('$\Sigma$ (M$_{\odot}$/pc$^2$)')
