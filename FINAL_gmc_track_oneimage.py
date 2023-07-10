@@ -13,13 +13,14 @@ import pandas as pd
 from astropy.io import ascii
 from astropy.table import Table
 
-MsunToGm = 1.99e33 #conversion from mass of sun to the mass times the constant G
+MsunToGm = 1.99e33 #conversion from mass of sun to the mass of sun in grams
 KpcToCm = 3.086e21 #conversion from kiloparsecs to centimeters
 mp = 1.67e-24 #mass of a proton in mega grams
 #bin_edge = 10.
-bin_edge = 20. #the bin edge value
+bin_edge = 20. #to make the grid, it will be 20 kpc from the center in all directions
 ##gas properties to carry around
 
+#creating empty lists to fill
 xg = [] #x position of gas
 yg = [] #y position of gas
 zg = [] #z position of gas
@@ -51,22 +52,22 @@ gxp = [] #gas x position?
 gyp = [] #gas y position?
 gzp = [] #gas z position?
 
-vdispx = [] #velocity at the x position?
-vdispy = [] #velocity at the y position?
-vdispz = [] #veloctiy at the z position?
+vdispx = [] #standard deviation of vx
+vdispy = [] #standard deviation of vy
+vdispz = [] #standard deviation of vz
 
-snaps = np.arange(590,593,1) #set snaps to an arrange of values
+snaps = np.arange(590,593,1) #set snaps to an arrange of values, goes from 590 to but not including 593 going up by 1
 cl_id = pickle.load(open('m12m_591_clusters.pkl','rb')) 
-#loads a pickle file of m12m cluster and sets it to a variable
+#loads a pickle file of m12m cluster and sets it to a variable, cloud id
 
-sxcm = np.zeros(shape=(len(snaps),len(cl_id))) #star x position in cm
-sycm = np.zeros(shape=(len(snaps),len(cl_id))) #star y position in cm
-szcm = np.zeros(shape=(len(snaps),len(cl_id))) #star z position in cm
-ap_num = np.zeros(shape=(len(snaps),len(cl_id))) #???
+sxcm = np.zeros(shape=(len(snaps),len(cl_id))) #empty array of star center of mass in x
+sycm = np.zeros(shape=(len(snaps),len(cl_id))) #empty array of star center of mass in y
+szcm = np.zeros(shape=(len(snaps),len(cl_id))) #empty array of star center of mass in z
+ap_num = np.zeros(shape=(len(snaps),len(cl_id))) ###Ask Sam what this is
 
-r_ap = 0.05 #radius of ap
+r_ap = 0.05 ###Ask Sam what this is
 
-point_gas = [] #gas point
+point_gas = [] ###Ask Sam what this is
 
 #snap time
 tsnap = []
@@ -84,22 +85,24 @@ for i in range(len(snaps)): #if i is in the range of the length of snaps
     tsnap.append(np.max(part['star'].prop('form.time'))) #add the max star form time to the snap times
 
     ig = np.where((part['gas'].prop('host.distance.principal.cylindrical')[:,0] <= bin_edge) & (np.fabs(part['gas'].prop('host.distance.principal.cartesian')[:,2]) <= 1.5) & (part['gas']['temperature'] <= 1e4))
-    #sets a variable where the gas cylindrical distance is less than or equal to the bin edge and 
-    #the cartesian distance is less than or equal to 1.5 and the gas temperature is less than 10000
+    #get the indices where the gas cylindrical radius is less than or equal to the bin edge and 
+    #the cartesian distance height is less than or equal to 1.5 and the gas temperature is less than 10000, cold
+    #index gas
     
     ist = np.where((part['star'].prop('host.distance.principal.cylindrical')[:,0] <= bin_edge) & (np.fabs(part['star'].prop('host.distance.principal.cartesian')[:,2]) <= 1.5))
-    #sets a variable where the star cylindrical distance is less than or equal to the bin edge and
+    #get the indices where the star cylindrical radius is less than or equal to the bin edge and
     #the cartesian distance is less than or equal to 1.5
+    #can change the variable to is to be easier
     
     xg.append(part['gas'].prop('host.distance.principal.cartesian')[ig[0],0]) 
-    #add the cartesian x coordinate of ig to the x values of the gas
+    #add the cartesian x coordinate of ig to the x values of the gas of the empty array
     yg.append(part['gas'].prop('host.distance.principal.cartesian')[ig[0],1])
     #add the cartesian y coordinate of ig to the y values of the gas
     zg.append(part['gas'].prop('host.distance.principal.cartesian')[ig[0],2])
     #add the cartesian z coordinate of ig to the z values of the gas
     
     vxg.append(part['gas'].prop('host.velocity.principal.cartesian')[ig[0],0])
-    #add the x velocity of ig to the x velocity values of the gas
+    #add the x velocity of ig to the x velocity values of the gas of the empty array
     vyg.append(part['gas'].prop('host.velocity.principal.cartesian')[ig[0],1])
     #add the y velocity of ig to the y velocity values of the gas
     vzg.append(part['gas'].prop('host.velocity.principal.cartesian')[ig[0],2])
@@ -109,10 +112,11 @@ for i in range(len(snaps)): #if i is in the range of the length of snaps
     #add the mass of ig to the mass values of the gas
     rhog.append(part['gas'].prop('number.density')[ig])
     #add the number density of ig to the density values of the gas
+    #take a look to see the density
     tg.append(part['gas']['temperature'][ig])
     #add the temperature of ig to the temperature values of the gas
     idg.append(part['gas']['id'][ig])
-    #add the id of ig to the id values of the gas
+    #add the id of ig to the id values of the gas particle
     
     xs.append(part['star'].prop('host.distance.principal.cartesian')[ist[0],0])
     #add the cartesian x coordinate of ist to the x values of the stars
@@ -124,7 +128,7 @@ for i in range(len(snaps)): #if i is in the range of the length of snaps
     #add the mass of ist to the mass values of the stars
     ids.append(part['star']['id'][ist])
     #add the id of ist to the id values of the stars
-    sage.append(part['star'].prop('age')[ist]*1000.)
+    sage.append(part['star'].prop('age')[ist]*1000.) #converting age to Mega years instead of G Year
     #add the age of ist to the age values of the stars
         
     msh = np.array(ms[i])
@@ -155,10 +159,10 @@ for i in range(len(snaps)): #if i is in the range of the length of snaps
     for j in range(len(cl_id)):
         #when it is in the range of the length of the pickle file we opened
         cl = cl_id[j] #assign variable cl to be the points in the range of the pickle file m12m
-        ind = [] #creating a list
-        check = [] #creating a list
-        print(j, ind, check) #print the j, ind, and check
-        for k in range(len(cl)):
+        ind = [] #creating a list for indices that belong to a cloud
+        check = [] #creating a list to look at the number of particles in each cloud
+        print(j, ind, check) #print the j, ind, and check, an empty list
+        for k in range(len(cl)): #making sure the actual id numbers match with id numbers
             #when it is in the range of the length of cl
             ind.append(np.where(cl[k] == ids[i])[0]) 
             #add the value of cl of k is equal to the first value of the id for stars to ind
