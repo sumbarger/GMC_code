@@ -57,6 +57,8 @@ vdispy = [] #standard deviation of vy
 vdispz = [] #standard deviation of vz
 
 snaps = np.arange(590,593,1) #set snaps to an arrange of values, goes from 590 to but not including 593 going up by 1
+
+############################################################################################## loads pickle files
 cl_id = pickle.load(open('m12m_591_clusters.pkl','rb')) 
 #loads a pickle file of m12m cluster and sets it to a variable, cloud id
 
@@ -77,10 +79,12 @@ tsnap = []
 
 for i in range(len(snaps)): #if i is in the range of the length of snaps
     #/home/smbeninc/scr/m12m/m12m_res7100/ #where it is located
+    ################################################################################################# reads in snapshots
     #part = gizmo.io.Read.read_snapshots('all', 'snapshot_index', snaps[i],assign_host_principal_axes=True)
     #read the snapshot
 
     part = gizmo.io.Read.read_snapshots('all', 'snapshot_index', snaps[i],'../gmc/m12m/',assign_host_principal_axes=True) #read snapshot of m12m and assingn principal axes
+    ################################################################################################# reads in snapshots
 
     tsnap.append(np.max(part['star'].prop('form.time'))) #add the max star form time to the snap times
 
@@ -249,12 +253,15 @@ zcm_track = np.zeros(shape=(3,len(cl_id))) #creates an array of zeros with the l
 
 data0 = ascii.read('cloud_props_m12m_590.txt') #read the text file
 idata0 = ascii.read('cloud_indices_m12m_590.txt') #read the text file
+################################################################################################# reads in text files for cloud properties of snapshot 590
 
 data = ascii.read('cloud_props_m12m_591.txt') #read the text file
 idata = ascii.read('cloud_indices_m12m_591.txt') #read the text file
+################################################################################################# reads in text files for cloud properties of snapshot 591
 
 data2 = ascii.read('cloud_props_m12m_592.txt') #read the text file
 idata2 = ascii.read('cloud_indices_m12m_592.txt') #read the text file
+################################################################################################# reads in text files for cloud properties of snapshot 592
 
 for focus in focus_list:
     #focus on the ones in the focus_list
@@ -437,6 +444,7 @@ vel_array2 = np.zeros(shape=(2,stepn, stepn)) #make empty arrays
 #read the kernel file
 kernelfile = 'kernel2d'
 temp = open(kernelfile,'r').read().split('\n') #open kernel file and read
+################################################################################################# reads in kernel file
 
 for i in range(len(temp)-1): #in the range of temperature minus one
     if (i%2 == 0): #if i/2 is zero
@@ -464,6 +472,7 @@ for t in range(len(snaps)): #look at the snapshot
     #read in sim snap
     part = gizmo.io.Read.read_snapshots('all', 'snapshot_index', snaps[t],'/home/smbeninc/scr/m12m/m12m_res7100/',assign_host_principal_axes=True)
     #part = gizmo.io.Read.read_snapshots('all', 'snapshot_index', snaps[t],assign_host_principal_axes=True)
+    ################################################################################################# reads in snapshots
     
     ig = np.where((part['gas'].prop('host.distance.principal.cartesian')[:,0] <= (xcen + bin_edge)) & (part['gas'].prop('host.distance.principal.cartesian')[:,0] > (xcen - bin_edge)) &  (part['gas'].prop('host.distance.principal.cartesian')[:,1] > (ycen - bin_edge)) & (part['gas'].prop('host.distance.principal.cartesian')[:,1] <= (ycen + bin_edge)) & (np.fabs(part['gas'].prop('host.distance.principal.cartesian')[:,2]) <= 1.5))
     #take cartesian coordinate of gas distance difference and creating bounds
