@@ -73,9 +73,9 @@ point_gas = [] ###Ask Sam what this is
 
 #snap time
 tsnap = []
-############################################################################
+###############################################################
 #read in sim files and find relevant particles
-############################################################################
+###############################################################
 
 for i in range(len(snaps)): #if i is in the range of the length of snaps
     #/home/smbeninc/scr/m12m/m12m_res7100/ #where it is located
